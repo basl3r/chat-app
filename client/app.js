@@ -4,8 +4,18 @@ const messagesList = document.querySelector('#messages-list');
 const addMessageForm = document.querySelector('#add-messages-form');
 const userNameInput = document.querySelector('#username');
 const messageContentInput = document.querySelector('#message-content');
+const socket = io();
 
 let userName;
+
+socket.on('message', event => addMessage(event.author, event.content));
+socket.on('join', event => {
+  console.log('event:', event);
+  addMessage('ChatBot', `${event} has joined the conversation!`);
+});
+socket.on('userDisconnected', event => {
+  addMessage('ChatBot', `${event} has left the conversation!`);
+});
 
 const hideMessages = () => {
   messagesSection.classList.remove('show');
@@ -17,6 +27,8 @@ const login = () => {
 
   loginForm.classList.remove('show');
   messagesSection.classList.add('show');
+
+  socket.emit('join', userName);
 };
 
 const addMessage = (author, content) => {
@@ -39,6 +51,7 @@ const sendMessage = () => {
     return;
   }
   addMessage(userName, messageContentInput.value);
+  socket.emit('message', { author: userName, content: messageContentInput.value });
   messageContentInput.value = '';
 };
 
@@ -53,3 +66,4 @@ addMessageForm.addEventListener('submit', e => {
   e.preventDefault();
   sendMessage();
 });
+
