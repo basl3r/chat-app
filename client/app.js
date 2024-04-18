@@ -9,12 +9,11 @@ const socket = io();
 let userName;
 
 socket.on('message', event => addMessage(event.author, event.content));
-socket.on('join', event => {
-  console.log('event:', event);
-  addMessage('ChatBot', `${event} has joined the conversation!`);
+socket.on('join', author => {
+  addMessage('ChatBot', `${author} has joined the conversation!`);
 });
-socket.on('userDisconnected', event => {
-  addMessage('ChatBot', `${event} has left the conversation!`);
+socket.on('userDisconnected', author => {
+  addMessage('ChatBot', `${author} has left the conversation!`);
 });
 
 const hideMessages = () => {
